@@ -1,5 +1,5 @@
 # <u> Dataset Report  </u>
-## actoryGuard AI- Predictive Maintenance Dataset Documentation
+## FactoryGuard AI- Predictive Maintenance Dataset Documentation
 
 ---
 
