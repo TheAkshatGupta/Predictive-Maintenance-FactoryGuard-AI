@@ -97,3 +97,19 @@ To ensure transparency and trust:
 - **Nishit** – Modeling  
 - **Kashak** – Documentation  
 - **Anushka** – EDA & Analysis  
+
+---
+
+## Project Status
+
+This project has been finalized at the notebook (research and experimentation) level.
+
+The complete machine learning pipeline has been implemented using Jupyter notebooks,
+including:
+- Data cleaning and exploratory data analysis
+- Baseline and improved model training
+- Model evaluation using F1-score and recall
+- Model explainability using SHAP
+
+The focus of this project was on understanding and analyzing predictive maintenance
+using real-world sensor data rather than deployment.
