@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/predict.py": {
-      "runtime": "@vercel/python"
+      "runtime": "python3.11"
     }
   },
   "routes": [
