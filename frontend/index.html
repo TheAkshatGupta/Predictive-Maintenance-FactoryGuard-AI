@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>FactoryGuard AI</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<h1>⚙️ FactoryGuard AI</h1>
+<p>Industrial Predictive Maintenance Dashboard</p>
+
+<div class="dashboard">
+
+<div class="slider-box">
+
+<label>Air Temperature (K)</label>
+<input type="range" id="air_temp" min="295" max="305" value="298">
+
+<label>Process Temperature (K)</label>
+<input type="range" id="process_temp" min="305" max="315" value="308">
+
+<label>Rotational Speed (RPM)</label>
+<input type="range" id="rpm" min="1100" max="3000" value="1500">
+
+<label>Torque (Nm)</label>
+<input type="range" id="torque" min="0" max="80" value="40">
+
+<label>Tool Wear (min)</label>
+<input type="range" id="wear" min="0" max="250" value="50">
+
+<button onclick="predict()">Predict Machine Status</button>
+
+</div>
+
+<div class="result-box">
+
+<h2>Machine Health</h2>
+
+<div id="status">
+
+Waiting for prediction...
+
+</div>
+
+</div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
