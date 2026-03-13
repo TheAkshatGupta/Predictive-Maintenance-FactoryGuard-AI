@@ -4,41 +4,95 @@
 <head>
 
 <title>FactoryGuard AI</title>
+
 <link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 </head>
 
 <body>
 
-<h1>⚙️ FactoryGuard AI</h1>
-<p>Industrial Predictive Maintenance Dashboard</p>
+<div class="hero">
 
-<div class="dashboard">
+<h1>⚙️ FactoryGuard AI</h1>
+
+<p class="tagline">AI Powered Predictive Maintenance Platform</p>
+
+<p class="subtext">
+
+Predict machine failures before they happen using machine learning.
+
+</p>
+
+</div>
+
+
+<section class="features">
+
+<h2>Machine Parameter Insights</h2>
+
+<div class="feature-grid">
+
+<div class="card">
+<h3>🌡 Temperature</h3>
+<p>High temperature increases internal machine stress.</p>
+</div>
+
+<div class="card">
+<h3>⚙️ RPM</h3>
+<p>High rotational speed increases friction and heat.</p>
+</div>
+
+<div class="card">
+<h3>🔩 Torque</h3>
+<p>Excessive torque overloads machine components.</p>
+</div>
+
+<div class="card">
+<h3>🛠 Tool Wear</h3>
+<p>More wear increases probability of machine failure.</p>
+</div>
+
+</div>
+
+</section>
+
+
+<section class="dashboard">
+
+<h2>Predict Machine Health</h2>
 
 <div class="slider-box">
 
 <label>Air Temperature (K)</label>
 <input type="range" id="air_temp" min="295" max="305" value="298">
+<span id="air_temp_value">298</span>
 
 <label>Process Temperature (K)</label>
 <input type="range" id="process_temp" min="305" max="315" value="308">
+<span id="process_temp_value">308</span>
 
 <label>Rotational Speed (RPM)</label>
 <input type="range" id="rpm" min="1100" max="3000" value="1500">
+<span id="rpm_value">1500</span>
 
 <label>Torque (Nm)</label>
 <input type="range" id="torque" min="0" max="80" value="40">
+<span id="torque_value">40</span>
 
 <label>Tool Wear (min)</label>
 <input type="range" id="wear" min="0" max="250" value="50">
+<span id="wear_value">50</span>
 
 <button onclick="predict()">Predict Machine Status</button>
 
 </div>
 
+
 <div class="result-box">
 
-<h2>Machine Health</h2>
+<h3>AI Prediction</h3>
 
 <div id="status">
 
@@ -46,11 +100,43 @@ Waiting for prediction...
 
 </div>
 
+<div class="meter">
+
+<div class="meter-bar">
+
+<div id="meter-fill"></div>
+
+</div>
+
+<p id="health-text">Machine Health: Unknown</p>
+
 </div>
 
 </div>
+
+</section>
+
+
+<footer class="footer">
+
+<p>Created with ❤️ by <span class="team">Team CYBERsYNTH</span></p>
+
+<div class="team-members">
+
+<a href="https://github.com/TheAkshatGupta" target="_blank">Akshat Gupta</a>
+
+<a href="#" target="_blank">Nishit</a>
+
+<a href="#" target="_blank">Anushka</a>
+
+<a href="#" target="_blank">Kashak</a>
+
+</div>
+
+</footer>
 
 <script src="script.js"></script>
 
 </body>
+
 </html>
