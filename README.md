@@ -124,7 +124,7 @@ streamlit run app.py
 
 ---
 
-### 👨‍💻 Team CYBERsYNTH
+## 👨‍💻 Team CYBERsYNTH
 
 - Akshat 
 - Anushka
@@ -142,6 +142,6 @@ streamlit run app.py
 
 ---
 
-##### 📜 License
+#### 📜 License
 
 This project is created for educational and research purposes.
