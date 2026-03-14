@@ -3,175 +3,254 @@ import joblib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+import shap
 import base64
+import time
+import random
 
-# ---------- PAGE SETTINGS ----------
 st.set_page_config(page_title="FactoryGuard AI", layout="wide")
 
-# ---------- BACKGROUND IMAGE ----------
-def set_bg():
-    with open("background.jpg", "rb") as f:
-        data = f.read()
-    encoded = base64.b64encode(data).decode()
+# ---------------- BACKGROUND ----------------
 
-    page_bg = f"""
+def set_bg():
+    with open("background.jpg","rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+
+    st.markdown(f"""
     <style>
+
     .stApp {{
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("data:image/jpg;base64,{encoded}");
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+    url("data:image/png;base64,{encoded}");
     background-size: cover;
-    background-position: center;
     }}
 
     html, body, [class*="css"] {{
-        font-family: 'Times New Roman';
-        font-size: 18px;
-        color: white;
+    font-family: "Times New Roman";
+    color: white;
     }}
 
     </style>
-    """
-
-    st.markdown(page_bg, unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 set_bg()
 
-# ---------- TITLE ----------
+# ---------------- MODEL ----------------
+
+model = joblib.load("model.pkl")
+
+# ---------------- TITLE ----------------
+
 st.title("🏭 FactoryGuard AI")
-st.subheader("Predictive Maintenance System")
+st.subheader("Enterprise Predictive Maintenance System")
 
 st.markdown("""
-Predictive Maintenance uses Artificial Intelligence to analyze machine sensor data and predict failures before they happen.
+FactoryGuard AI is an intelligent predictive maintenance platform designed
+to monitor industrial machines using sensor data and machine learning.
 
-This system monitors:
+Traditional maintenance systems rely on fixed schedules, which may either
+cause unexpected failures or unnecessary servicing.
 
-• Air Temperature  
-• Process Temperature  
-• Rotational Speed  
-• Torque  
-• Tool Wear  
+Predictive maintenance uses **AI and sensor analytics** to detect hidden
+patterns in machine behaviour and predict failures before they occur.
 
-Using machine learning, the system predicts whether the machine will fail or operate normally.
+This helps industries:
+
+• Reduce downtime  
+• Prevent costly breakdowns  
+• Increase operational efficiency  
+• Optimize maintenance planning
 """)
 
 st.divider()
 
-# ---------- LOAD MODEL ----------
-try:
-    model = joblib.load("model.pkl")
-except:
-    st.error("Model file not found. Please ensure model.pkl is in the project folder.")
-    st.stop()
+# ---------------- SENSOR DASHBOARD ----------------
 
-# ---------- SLIDERS ----------
-st.header("Machine Parameter Simulation")
+st.header("Machine Sensor Simulation")
 
-col1, col2 = st.columns(2)
+col1,col2,col3,col4,col5 = st.columns(5)
 
-with col1:
-    air_temp = st.slider("Air Temperature", 295.0, 305.0, 298.0)
-    process_temp = st.slider("Process Temperature", 305.0, 315.0, 308.0)
-    rpm = st.slider("Rotational Speed (RPM)", 1100, 3000, 1500)
+air_temp = col1.slider("Air Temp",295.0,305.0,298.0)
+process_temp = col2.slider("Process Temp",305.0,315.0,308.0)
+rpm = col3.slider("RPM",1100,3000,1500)
+torque = col4.slider("Torque",5.0,80.0,40.0)
+wear = col5.slider("Tool Wear",0,250,50)
 
-with col2:
-    torque = st.slider("Torque (Nm)", 5.0, 80.0, 40.0)
-    wear = st.slider("Tool Wear (minutes)", 0, 250, 50)
+# ---------------- REAL TIME SIMULATION ----------------
 
-# ---------- PREDICTION ----------
-if st.button("Predict Machine Status"):
+st.subheader("Real-Time Sensor Simulation")
 
-    features = np.array([[air_temp,process_temp,rpm,torque,wear,0,0,0,0,0,0]])
+if st.button("Simulate Sensor Stream"):
 
-    prediction = model.predict(features)
+    placeholder = st.empty()
 
-    # demo override
-    if wear > 200 or torque > 70:
-        prediction = [1]
+    for i in range(10):
 
-    if prediction[0] == 1:
-        st.error("⚠️ Machine Failure Predicted")
-    else:
-        st.success("✅ Normal Machine Operation")
+        simulated = {
+            "Air Temp": air_temp + random.uniform(-1,1),
+            "Process Temp": process_temp + random.uniform(-1,1),
+            "RPM": rpm + random.randint(-100,100),
+            "Torque": torque + random.uniform(-3,3),
+            "Wear": wear + random.randint(-5,5)
+        }
+
+        placeholder.write(simulated)
+
+        time.sleep(0.5)
 
 st.divider()
 
-# ---------- COLORFUL GRAPH ----------
-st.header("Machine Parameter Visualization")
+# ---------------- PREDICTION ----------------
+
+features = np.array([[air_temp,process_temp,rpm,torque,wear,0,0,0,0,0,0]])
+
+prediction = model.predict(features)
+
+# ---------------- HEALTH GAUGE ----------------
+
+health = max(0,100-(wear*0.3 + torque*0.5))
+
+col1,col2 = st.columns(2)
+
+with col1:
+
+    gauge = go.Figure(go.Indicator(
+        mode="gauge+number",
+        value=health,
+        title={'text': "Machine Health"},
+        gauge={
+            'axis':{'range':[0,100]},
+            'bar':{'color':"cyan"},
+            'steps':[
+                {'range':[0,40],'color':'red'},
+                {'range':[40,70],'color':'orange'},
+                {'range':[70,100],'color':'green'}
+            ]
+        }
+    ))
+
+    st.plotly_chart(gauge,use_container_width=True)
+
+# ---------------- FAILURE PROBABILITY ----------------
+
+with col2:
+
+    prob = min(1,(wear*0.01 + torque*0.01))
+
+    fig = go.Figure(go.Bar(
+        x=["Failure Probability"],
+        y=[prob],
+        marker_color="crimson"
+    ))
+
+    fig.update_layout(title="Failure Risk")
+
+    st.plotly_chart(fig,use_container_width=True)
+
+st.divider()
+
+# ---------------- SENSOR GRAPH + EXPLANATION ----------------
+
+col1,col2 = st.columns([1.5,1])
 
 data = pd.DataFrame({
-    "Parameter": ["Air Temp","Process Temp","RPM","Torque","Tool Wear"],
-    "Value": [air_temp,process_temp,rpm,torque,wear]
+"Parameter":["Air Temp","Process Temp","RPM","Torque","Wear"],
+"Value":[air_temp,process_temp,rpm,torque,wear]
 })
 
-fig, ax = plt.subplots()
+with col1:
 
-colors = ["#00FFFF","#00FF7F","#FFD700","#FF5733","#FF00FF"]
+    fig,ax = plt.subplots()
 
-ax.bar(data["Parameter"], data["Value"], color=colors)
+    colors = ["cyan","lime","gold","orange","magenta"]
 
-ax.set_title("Machine Sensor Values")
-ax.set_ylabel("Values")
+    ax.bar(data["Parameter"],data["Value"],color=colors)
+
+    ax.set_title("Machine Sensor Visualization")
+
+    st.pyplot(fig)
+
+with col2:
+
+    st.markdown("""
+### Graph Explanation
+
+This visualization shows real-time machine sensor values.
+
+Key insights:
+
+• High **Torque** increases mechanical stress  
+• High **Tool Wear** indicates tool degradation  
+• Abnormal sensor combinations increase failure probability  
+
+Predictive maintenance models continuously analyze these signals
+to detect early warning signs of machine failure.
+""")
+
+st.divider()
+
+# ---------------- SHAP EXPLAINABLE AI ----------------
+
+st.header("Explainable AI – Feature Importance")
+
+explainer = shap.TreeExplainer(model)
+
+shap_values = explainer.shap_values(features)
+
+fig = plt.figure()
+
+shap.summary_plot(shap_values,features,show=False)
 
 st.pyplot(fig)
 
-st.markdown("""
-### Graph Explanation
+st.divider()
 
-The bar chart shows real-time machine sensor values.
+# ---------------- FAILURE TIMELINE ----------------
 
-Higher values in **Torque and Tool Wear** often increase the risk of machine failure.
+st.header("Predicted Failure Timeline")
 
-The model analyzes these parameters together to detect abnormal machine behavior.
-""")
+timeline = pd.DataFrame({
+"Time":["Now","1 Day","3 Days","1 Week"],
+"Failure Risk":[prob,prob+0.1,prob+0.2,prob+0.3]
+})
+
+st.line_chart(timeline.set_index("Time"))
 
 st.divider()
 
-# ---------- MODEL INFO ----------
-st.header("Machine Learning Model")
+# ---------------- COST PREDICTION ----------------
 
-st.markdown("""
-This system uses a **Random Forest Machine Learning Model** trained on industrial predictive maintenance data.
+st.header("Maintenance Cost Prediction")
 
-The model analyzes multiple sensor readings and predicts whether a machine may fail.
+failure_cost = 5000
+preventive_cost = 1500
 
-Important features influencing prediction:
+if prediction[0]==1:
 
-• Tool Wear  
-• Torque  
-• Rotational Speed  
-• Process Temperature  
-""")
+    st.error("⚠ Machine Failure Predicted")
+
+    st.write("Estimated Failure Cost:",failure_cost)
+
+else:
+
+    st.success("Machine Operating Normally")
+
+    st.write("Estimated Preventive Maintenance Cost:",preventive_cost)
 
 st.divider()
 
-# ---------- FOOTER ----------
-st.markdown("""
-<style>
-.footer {
-position: fixed;
-left: 0;
-bottom: 0;
-width: 100%;
-background-color: rgba(0,0,0,0.7);
-color: white;
-text-align: center;
-padding: 10px;
-font-size:16px;
-}
-.footer a {
-color: #00FFFF;
-margin: 0 12px;
-text-decoration: none;
-}
-.footer a:hover {
-color: #FFD700;
-}
-</style>
+# ---------------- FOOTER ----------------
 
-<div class="footer">
-Created with ❤️ by <b>Team CYBERsYNTH</b><br>
-<a href="https://github.com/TheAkshatGupta" target="_blank">Akshat</a>
-<a href="https://github.com/anushka4523" target="_blank">Anushka</a>
-<a href="https://github.com/nish-debug15" target="_blank">Nishit</a>
-<a href="https://github.com/kashak09" target="_blank">Kashak</a>
-</div>
-""", unsafe_allow_html=True)
+st.markdown("""
+
+---
+
+Created with ❤️ by **Team CYBERsYNTH**
+
+[Akshat](https://github.com/TheAkshatGupta) |
+[Anushka](https://github.com/anushka4523) |
+[Nishit](https://github.com/nish-debug15) |
+[Kashak](https://github.com/kashak09)
+
+""")
