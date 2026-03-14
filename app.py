@@ -6,6 +6,20 @@ import matplotlib.pyplot as plt
 import base64
 
 st.set_page_config(page_title="FactoryGuard AI", layout="wide")
+st.markdown("""
+<style>
+
+h1{
+font-family:Times New Roman;
+font-weight:bold;
+}
+
+h2{
+color:#00FFFF;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 # ---------- BACKGROUND ----------
 def set_bg():
@@ -82,13 +96,22 @@ st.write("Health Score:", int(health), "%")
 st.divider()
 
 # ---------- FAILURE PROBABILITY ----------
-failure_prob = min(1,(wear*0.01 + torque*0.01))
+failure_prob = min(1,(wear*0.02 + torque*0.015))
 
-st.header("Failure Probability")
+st.markdown(""" 
+            Green -> Machine is healthy
+            Red -> High failure risk
+            
+            Higher torque and wear increase failure probability.
+            """)
 
 fig,ax = plt.subplots()
 
-ax.bar(["Failure Risk"],[failure_prob],color="red")
+
+labels = ["Healthy","Failure Risk"]
+values = [1-failure_prob,failure_prob]
+colors = ["green","red"]
+ax.bar(labels,values,color=colors)
 
 ax.set_ylim(0,1)
 
@@ -138,7 +161,7 @@ st.divider()
 # ---------- AI RECOMMENDATION ----------
 st.header("AI Recommendation")
 
-if prediction[0]==1:
+if failure_prob> 0.7:
 
     st.error("⚠ Machine Failure Predicted")
 
@@ -148,6 +171,12 @@ if prediction[0]==1:
     st.write("- Reduce machine load")
     st.write("- Schedule maintenance")
 
+elif failure_prob> 0.4:
+    st.warning("⚠ Elevated Failure Risk")
+
+    st.write("Recommended Actions:")
+    st.write("- Monitor machine closely")
+    st.write("- Schedule preventive maintenance")
 else:
 
     st.success("✅ Machine Operating Normally")
@@ -159,29 +188,54 @@ st.divider()
 # ---------- COST ----------
 st.header("Maintenance Cost Estimate")
 
-failure_cost = 5000
-preventive_cost = 1500
+if failure_prob>0.7:
+    cost = 5000
+elif failure_prob>0.4:
+    cost = 3000
+else:
+    cost = 1500
 
 if prediction[0]==1:
 
-    st.write("Estimated breakdown cost:", failure_cost)
+    st.write("Estimated breakdown cost:", cost)
 
 else:
 
-    st.write("Estimated preventive maintenance cost:", preventive_cost)
+    st.write("Estimated preventive maintenance cost:", cost)
 
 st.divider()
 
 # ---------- FOOTER ----------
 st.markdown("""
+<style>
 
----
+.footer {
+text-align:center;
+font-size:18px;
+margin-top:40px;
+}
 
-Created with ❤️ by **Team CYBERsYNTH**
+.footer a{
+color:#00FFFF;
+text-decoration:none;
+margin:0 8px;
+}
 
-[Akshat](https://github.com/TheAkshatGupta) |
-[Anushka](https://github.com/anushka4523) |
-[Nishit](https://github.com/nish-debug15) |
-[Kashak](https://github.com/kashak09)
+.footer a:hover{
+color:#FFD700;
+}
 
-""")
+</style>
+
+<div class="footer">
+
+Created with ❤️ by <b>Team CYBERsYNTH</b><br>
+
+<a href="https://github.com/TheAkshatGupta">Akshat</a> |
+<a href="https://github.com/anushka4523">Anushka</a> |
+<a href="https://github.com/nish-debug15">Nishit</a> |
+<a href="https://github.com/kashak09">Kashak</a>
+
+</div>
+
+""", unsafe_allow_html=True)
