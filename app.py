@@ -3,7 +3,6 @@ import joblib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 import base64
 
 st.set_page_config(page_title="FactoryGuard AI", layout="wide")
@@ -34,7 +33,7 @@ def set_bg():
 
 set_bg()
 
-# ---------- LOAD MODEL ----------
+# ---------- MODEL ----------
 model = joblib.load("model.pkl")
 
 # ---------- TITLE ----------
@@ -43,14 +42,14 @@ st.subheader("Predictive Maintenance Intelligence Dashboard")
 
 st.markdown("""
 FactoryGuard AI is an AI-powered predictive maintenance system that analyzes
-industrial machine sensor data to detect potential failures before they occur.
+industrial machine sensor data to predict potential failures before they occur.
 
 Predictive maintenance helps industries:
 
-• Reduce machine downtime  
-• Prevent unexpected failures  
-• Improve production efficiency  
-• Optimize maintenance scheduling
+• Reduce downtime  
+• Prevent machine breakdowns  
+• Improve efficiency  
+• Optimize maintenance planning
 """)
 
 st.divider()
@@ -66,56 +65,38 @@ rpm = c3.slider("RPM",1100,3000,1500)
 torque = c4.slider("Torque",5.0,80.0,40.0)
 wear = c5.slider("Tool Wear",0,250,50)
 
-st.divider()
-
-# ---------- MODEL PREDICTION ----------
+# ---------- PREDICTION ----------
 features = np.array([[air_temp,process_temp,rpm,torque,wear,0,0,0,0,0,0]])
 
 prediction = model.predict(features)
 
-# ---------- MACHINE HEALTH ----------
+# ---------- HEALTH SCORE ----------
 health = max(0,100-(wear*0.3 + torque*0.5))
 
-col1,col2 = st.columns(2)
+st.header("Machine Health Score")
 
-# ---------- HEALTH GAUGE ----------
-with col1:
+st.progress(int(health))
 
-    gauge = go.Figure(go.Indicator(
-        mode="gauge+number",
-        value=health,
-        title={'text': "Machine Health Score"},
-        gauge={
-            'axis':{'range':[0,100]},
-            'bar':{'color':"cyan"},
-            'steps':[
-                {'range':[0,40],'color':'red'},
-                {'range':[40,70],'color':'orange'},
-                {'range':[70,100],'color':'green'}
-            ]
-        }
-    ))
-
-    st.plotly_chart(gauge,use_container_width=True)
-
-# ---------- FAILURE PROBABILITY ----------
-with col2:
-
-    failure_prob = min(1,(wear*0.01 + torque*0.01))
-
-    fig = go.Figure(go.Bar(
-        x=["Failure Probability"],
-        y=[failure_prob],
-        marker_color="crimson"
-    ))
-
-    fig.update_layout(title="Failure Risk")
-
-    st.plotly_chart(fig,use_container_width=True)
+st.write("Health Score:", int(health), "%")
 
 st.divider()
 
-# ---------- SENSOR GRAPH + EXPLANATION ----------
+# ---------- FAILURE PROBABILITY ----------
+failure_prob = min(1,(wear*0.01 + torque*0.01))
+
+st.header("Failure Probability")
+
+fig,ax = plt.subplots()
+
+ax.bar(["Failure Risk"],[failure_prob],color="red")
+
+ax.set_ylim(0,1)
+
+st.pyplot(fig)
+
+st.divider()
+
+# ---------- SENSOR GRAPH ----------
 col1,col2 = st.columns([1.5,1])
 
 data = pd.DataFrame({
@@ -140,63 +121,54 @@ with col2:
     st.markdown("""
 ### Sensor Analysis Explanation
 
-This graph visualizes real-time machine sensor readings.
+This chart shows current machine sensor values.
 
-Key insights:
+Important indicators:
 
-• **Torque** indicates mechanical load on the machine  
-• **Tool Wear** shows the degradation of cutting tools  
-• High values of both increase failure probability
+• High **Torque** increases mechanical stress  
+• High **Tool Wear** indicates tool degradation  
+• Abnormal values increase failure risk
 
-Machine learning models analyze these parameters together
-to predict whether a machine is likely to fail.
+The AI model analyzes these parameters to determine
+machine health and predict possible failures.
 """)
 
 st.divider()
 
 # ---------- AI RECOMMENDATION ----------
-st.header("AI Maintenance Recommendation")
+st.header("AI Recommendation")
 
 if prediction[0]==1:
 
     st.error("⚠ Machine Failure Predicted")
 
-    st.markdown("""
-Recommended Actions:
+    st.write("Recommended Actions:")
 
-• Inspect machine tool immediately  
-• Reduce operational load  
-• Schedule preventive maintenance  
-• Monitor torque fluctuations
-""")
+    st.write("- Inspect machine tool")
+    st.write("- Reduce machine load")
+    st.write("- Schedule maintenance")
 
 else:
 
     st.success("✅ Machine Operating Normally")
 
-    st.markdown("""
-System Status:
-
-• Machine health is stable  
-• Continue routine monitoring  
-• Schedule maintenance as per plan
-""")
+    st.write("System Status: Stable")
 
 st.divider()
 
-# ---------- COST ESTIMATION ----------
-st.header("Maintenance Cost Estimation")
+# ---------- COST ----------
+st.header("Maintenance Cost Estimate")
 
 failure_cost = 5000
 preventive_cost = 1500
 
 if prediction[0]==1:
 
-    st.write("Estimated breakdown cost:",failure_cost)
+    st.write("Estimated breakdown cost:", failure_cost)
 
 else:
 
-    st.write("Estimated preventive maintenance cost:",preventive_cost)
+    st.write("Estimated preventive maintenance cost:", preventive_cost)
 
 st.divider()
 
