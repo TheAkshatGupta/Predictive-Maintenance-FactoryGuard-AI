@@ -4,18 +4,16 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-import shap
 import base64
-import time
-import random
 
 st.set_page_config(page_title="FactoryGuard AI", layout="wide")
 
-# ---------------- BACKGROUND ----------------
-
+# ---------- BACKGROUND ----------
 def set_bg():
     with open("background.jpg","rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
+        data = f.read()
+
+    encoded = base64.b64encode(data).decode()
 
     st.markdown(f"""
     <style>
@@ -36,89 +34,57 @@ def set_bg():
 
 set_bg()
 
-# ---------------- MODEL ----------------
-
+# ---------- LOAD MODEL ----------
 model = joblib.load("model.pkl")
 
-# ---------------- TITLE ----------------
-
+# ---------- TITLE ----------
 st.title("🏭 FactoryGuard AI")
-st.subheader("Enterprise Predictive Maintenance System")
+st.subheader("Predictive Maintenance Intelligence Dashboard")
 
 st.markdown("""
-FactoryGuard AI is an intelligent predictive maintenance platform designed
-to monitor industrial machines using sensor data and machine learning.
+FactoryGuard AI is an AI-powered predictive maintenance system that analyzes
+industrial machine sensor data to detect potential failures before they occur.
 
-Traditional maintenance systems rely on fixed schedules, which may either
-cause unexpected failures or unnecessary servicing.
+Predictive maintenance helps industries:
 
-Predictive maintenance uses **AI and sensor analytics** to detect hidden
-patterns in machine behaviour and predict failures before they occur.
-
-This helps industries:
-
-• Reduce downtime  
-• Prevent costly breakdowns  
-• Increase operational efficiency  
-• Optimize maintenance planning
+• Reduce machine downtime  
+• Prevent unexpected failures  
+• Improve production efficiency  
+• Optimize maintenance scheduling
 """)
 
 st.divider()
 
-# ---------------- SENSOR DASHBOARD ----------------
+# ---------- SENSOR DASHBOARD ----------
+st.header("Machine Sensor Dashboard")
 
-st.header("Machine Sensor Simulation")
+c1,c2,c3,c4,c5 = st.columns(5)
 
-col1,col2,col3,col4,col5 = st.columns(5)
-
-air_temp = col1.slider("Air Temp",295.0,305.0,298.0)
-process_temp = col2.slider("Process Temp",305.0,315.0,308.0)
-rpm = col3.slider("RPM",1100,3000,1500)
-torque = col4.slider("Torque",5.0,80.0,40.0)
-wear = col5.slider("Tool Wear",0,250,50)
-
-# ---------------- REAL TIME SIMULATION ----------------
-
-st.subheader("Real-Time Sensor Simulation")
-
-if st.button("Simulate Sensor Stream"):
-
-    placeholder = st.empty()
-
-    for i in range(10):
-
-        simulated = {
-            "Air Temp": air_temp + random.uniform(-1,1),
-            "Process Temp": process_temp + random.uniform(-1,1),
-            "RPM": rpm + random.randint(-100,100),
-            "Torque": torque + random.uniform(-3,3),
-            "Wear": wear + random.randint(-5,5)
-        }
-
-        placeholder.write(simulated)
-
-        time.sleep(0.5)
+air_temp = c1.slider("Air Temperature",295.0,305.0,298.0)
+process_temp = c2.slider("Process Temperature",305.0,315.0,308.0)
+rpm = c3.slider("RPM",1100,3000,1500)
+torque = c4.slider("Torque",5.0,80.0,40.0)
+wear = c5.slider("Tool Wear",0,250,50)
 
 st.divider()
 
-# ---------------- PREDICTION ----------------
-
+# ---------- MODEL PREDICTION ----------
 features = np.array([[air_temp,process_temp,rpm,torque,wear,0,0,0,0,0,0]])
 
 prediction = model.predict(features)
 
-# ---------------- HEALTH GAUGE ----------------
-
+# ---------- MACHINE HEALTH ----------
 health = max(0,100-(wear*0.3 + torque*0.5))
 
 col1,col2 = st.columns(2)
 
+# ---------- HEALTH GAUGE ----------
 with col1:
 
     gauge = go.Figure(go.Indicator(
         mode="gauge+number",
         value=health,
-        title={'text': "Machine Health"},
+        title={'text': "Machine Health Score"},
         gauge={
             'axis':{'range':[0,100]},
             'bar':{'color':"cyan"},
@@ -132,15 +98,14 @@ with col1:
 
     st.plotly_chart(gauge,use_container_width=True)
 
-# ---------------- FAILURE PROBABILITY ----------------
-
+# ---------- FAILURE PROBABILITY ----------
 with col2:
 
-    prob = min(1,(wear*0.01 + torque*0.01))
+    failure_prob = min(1,(wear*0.01 + torque*0.01))
 
     fig = go.Figure(go.Bar(
         x=["Failure Probability"],
-        y=[prob],
+        y=[failure_prob],
         marker_color="crimson"
     ))
 
@@ -150,8 +115,7 @@ with col2:
 
 st.divider()
 
-# ---------------- SENSOR GRAPH + EXPLANATION ----------------
-
+# ---------- SENSOR GRAPH + EXPLANATION ----------
 col1,col2 = st.columns([1.5,1])
 
 data = pd.DataFrame({
@@ -174,74 +138,69 @@ with col1:
 with col2:
 
     st.markdown("""
-### Graph Explanation
+### Sensor Analysis Explanation
 
-This visualization shows real-time machine sensor values.
+This graph visualizes real-time machine sensor readings.
 
 Key insights:
 
-• High **Torque** increases mechanical stress  
-• High **Tool Wear** indicates tool degradation  
-• Abnormal sensor combinations increase failure probability  
+• **Torque** indicates mechanical load on the machine  
+• **Tool Wear** shows the degradation of cutting tools  
+• High values of both increase failure probability
 
-Predictive maintenance models continuously analyze these signals
-to detect early warning signs of machine failure.
+Machine learning models analyze these parameters together
+to predict whether a machine is likely to fail.
 """)
 
 st.divider()
 
-# ---------------- SHAP EXPLAINABLE AI ----------------
+# ---------- AI RECOMMENDATION ----------
+st.header("AI Maintenance Recommendation")
 
-st.header("Explainable AI – Feature Importance")
+if prediction[0]==1:
 
-explainer = shap.TreeExplainer(model)
+    st.error("⚠ Machine Failure Predicted")
 
-shap_values = explainer.shap_values(features)
+    st.markdown("""
+Recommended Actions:
 
-fig = plt.figure()
+• Inspect machine tool immediately  
+• Reduce operational load  
+• Schedule preventive maintenance  
+• Monitor torque fluctuations
+""")
 
-shap.summary_plot(shap_values,features,show=False)
+else:
 
-st.pyplot(fig)
+    st.success("✅ Machine Operating Normally")
+
+    st.markdown("""
+System Status:
+
+• Machine health is stable  
+• Continue routine monitoring  
+• Schedule maintenance as per plan
+""")
 
 st.divider()
 
-# ---------------- FAILURE TIMELINE ----------------
-
-st.header("Predicted Failure Timeline")
-
-timeline = pd.DataFrame({
-"Time":["Now","1 Day","3 Days","1 Week"],
-"Failure Risk":[prob,prob+0.1,prob+0.2,prob+0.3]
-})
-
-st.line_chart(timeline.set_index("Time"))
-
-st.divider()
-
-# ---------------- COST PREDICTION ----------------
-
-st.header("Maintenance Cost Prediction")
+# ---------- COST ESTIMATION ----------
+st.header("Maintenance Cost Estimation")
 
 failure_cost = 5000
 preventive_cost = 1500
 
 if prediction[0]==1:
 
-    st.error("⚠ Machine Failure Predicted")
-
-    st.write("Estimated Failure Cost:",failure_cost)
+    st.write("Estimated breakdown cost:",failure_cost)
 
 else:
 
-    st.success("Machine Operating Normally")
-
-    st.write("Estimated Preventive Maintenance Cost:",preventive_cost)
+    st.write("Estimated preventive maintenance cost:",preventive_cost)
 
 st.divider()
 
-# ---------------- FOOTER ----------------
-
+# ---------- FOOTER ----------
 st.markdown("""
 
 ---
