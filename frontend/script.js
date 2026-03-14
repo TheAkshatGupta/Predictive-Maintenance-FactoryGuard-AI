@@ -16,7 +16,8 @@ let rpm=document.getElementById("rpm").value
 let torque=document.getElementById("torque").value
 let wear=document.getElementById("wear").value
 
-let response=await fetch( "https://factoryguard-ai-5slb.onrender.com/predict",{
+
+let response = await fetch("https://factoryguard-ai.onrender.com/predict", {
 
 method:"POST",
 
