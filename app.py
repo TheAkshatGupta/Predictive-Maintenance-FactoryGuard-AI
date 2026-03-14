@@ -27,7 +27,8 @@ def predict(data: MachineData):
         data.process_temp,
         data.rpm,
         data.torque,
-        data.wear
+        data.wear,
+        0,0,0,0,0,0
 
     ]])
 
