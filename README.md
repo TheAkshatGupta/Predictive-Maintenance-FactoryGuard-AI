@@ -1,115 +1,147 @@
-# Predictive Maintenance – FactoryGuard AI
 
-## Project Overview
-This project focuses on building an **industrial Predictive Maintenance system** to predict machine failures using sensor and operational data.  
-The goal is to develop a **clean, explainable, and production-oriented ML pipeline** rather than only optimizing for accuracy.
 
----
+# 🏭 FactoryGuard AI
 
-## Problem Statement
-Unexpected machine failures lead to downtime and high maintenance costs.  
-Using historical machine data, we aim to **predict machine failure in advance** so that preventive actions can be taken.
+Predictive Maintenance System using Machine Learning
+
+FactoryGuard AI is an intelligent predictive maintenance system that analyzes machine sensor data and predicts potential failures before they occur.
+
+The goal is to help industries reduce downtime, prevent machine breakdowns, and optimize maintenance planning using AI.
 
 ---
 
-## Dataset
-- Predictive Maintenance (AI4I-style) dataset  
-- Structured, tabular machine operating data  
-- Target variable: **Machine failure (binary classification)**  
+## 🌐 Live Demo
 
-### Key Features
-- Air temperature  
-- Process temperature  
-- Rotational speed  
-- Torque  
-- Tool wear  
-- Failure indicators (TWF, HDF, PWF, OSF, RNF)
+https://predictive-maintenance-factoryguard-ai.streamlit.app
 
 ---
 
-## Tech Stack
-- **Python**
-- **Pandas, NumPy** – Data processing  
-- **Scikit-learn** – Modeling & evaluation  
-- **Logistic Regression, Random Forest** – ML models  
-- **SHAP** – Explainability  
-- **GitHub** – Version control  
+## 📌 Problem Statement
+
+In industrial environments, unexpected machine failures can cause:
+
+- Production downtime
+- High maintenance costs
+- Safety risks
+- Revenue loss
+
+Traditional maintenance strategies like reactive maintenance or scheduled maintenance are inefficient.
+
+FactoryGuard AI solves this problem using predictive maintenance, where machine sensor data is analyzed using machine learning models to detect failure risks early.
 
 ---
 
-## Project Workflow
-1. Data cleaning and preprocessing  
-2. Exploratory Data Analysis (EDA)  
-3. Baseline model development  
-4. Improved model implementation  
-5. Model evaluation  
-6. Explainability using SHAP  
-7. Documentation and review preparation  
+## ⚙️ System Workflow
+
+Machine Sensors → Data Processing → Machine Learning Model → Failure Prediction → Maintenance Recommendation
 
 ---
 
-## Models Implemented
+## 🚀 Features
 
-### Baseline Model – Logistic Regression
-- Time-based train–test split  
-- Class imbalance handled using `class_weight='balanced'`  
-- Evaluation metrics: **F1-score, Recall, Confusion Matrix**
-
-### Improved Model – Random Forest
-- Same data split and evaluation strategy as baseline  
-- Captures non-linear relationships  
-- Comparable performance, validating baseline stability  
+- Machine Health Score
+- Failure Probability Analysis
+- Real-time Sensor Simulation
+- AI Maintenance Recommendations
+- Sensor Data Visualization
+- Maintenance Cost Estimation
 
 ---
 
-## Model Comparison
+## 📊 Machine Sensors Used
 
-| Model | F1 Score | Recall |
-|------|----------|--------|
-| Logistic Regression | Reported | Reported |
-| Random Forest | Reported | Reported |
+Air Temperature
+Process Temperature
+Rotational Speed (RPM)
+Torque
+Tool Wear
 
----
-
-## Explainability (SHAP)
-To ensure transparency and trust:
-- **Global SHAP analysis** identifies the most influential features affecting machine failure.
-- **Local SHAP explanations** show how individual features impact predictions for a specific machine instance.
+These sensor readings are used by the ML model to determine the probability of machine failure.
 
 ---
 
-## Key Takeaways
-- Clean data can make simple models very effective  
-- Explainability is crucial for industrial ML adoption  
-- Focus was on pipeline correctness and interpretability  
+## 🧠 Machine Learning Model
+
+The system uses a Random Forest Classifier trained on predictive maintenance data.
+
+Model capabilities:
+
+- Detect abnormal machine behavior
+- Predict machine failure risk
+- Assist maintenance planning
 
 ---
 
-## Future Improvements
-- Hyperparameter tuning  
-- Advanced ensemble models  
-- Real-time deployment pipeline  
+## 🖥 Dashboard Capabilities
+
+The FactoryGuard AI dashboard provides:
+
+- Interactive sensor simulation
+- Machine health score
+- Failure prediction results
+- Parameter visualization charts
+- Maintenance recommendations
 
 ---
 
-## Team
-- **Akshat Gupta** – Team Lead, Data Processing & Explainability  
-- **Nishit** – Modeling  
-- **Kashak** – Documentation  
-- **Anushka** – EDA & Analysis  
+## 🛠 Tech Stack
+
+Python
+Streamlit
+Scikit-Learn
+Pandas
+NumPy
+Matplotlib
 
 ---
 
-## Project Status
+## 📁 Project Structure
 
-This project has been finalized at the notebook (research and experimentation) level.
+FactoryGuard-AI
+│
+├── app.py
+├── model.pkl
+├── background.jpg
+├── requirements.txt
+├── runtime.txt
+└── README.md
 
-The complete machine learning pipeline has been implemented using Jupyter notebooks,
-including:
-- Data cleaning and exploratory data analysis
-- Baseline and improved model training
-- Model evaluation using F1-score and recall
-- Model explainability using SHAP
+---
 
-The focus of this project was on understanding and analyzing predictive maintenance
-using real-world sensor data rather than deployment.
+## ▶️ Run Locally
+
+Clone the repository
+
+git clone https://github.com/TheAkshatGupta/Predictive-Maintenance-FactoryGuard-AI
+
+Install dependencies
+
+pip install -r requirements.txt
+
+Run the application
+
+streamlit run app.py
+
+---
+
+### 👨‍💻 Team CYBERsYNTH
+
+Akshat 
+Anushka
+Nishit
+Kashak
+
+---
+
+#### ⭐ Future Improvements
+
+- Real-time IoT sensor integration
+- Explainable AI (SHAP)
+- Advanced anomaly detection
+- Industrial monitoring dashboard
+
+---
+
+##### 📜 License
+
+This project is created for educational and research purposes.
