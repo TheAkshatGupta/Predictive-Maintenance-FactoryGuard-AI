@@ -1,177 +1,70 @@
 import streamlit as st
-import joblib
-import numpy as np
 import pandas as pd
+import joblib
 import matplotlib.pyplot as plt
-import base64
 
-# ---------- PAGE SETTINGS ----------
 st.set_page_config(page_title="FactoryGuard AI", layout="wide")
 
-# ---------- BACKGROUND IMAGE ----------
-def set_bg():
-    with open("background.jpg", "rb") as f:
-        data = f.read()
-    encoded = base64.b64encode(data).decode()
-
-    page_bg = f"""
-    <style>
-    .stApp {{
-    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("data:image/jpg;base64,{encoded}");
-    background-size: cover;
-    background-position: center;
-    }}
-
-    html, body, [class*="css"] {{
-        font-family: 'Times New Roman';
-        font-size: 18px;
-        color: white;
-    }}
-
-    </style>
-    """
-
-    st.markdown(page_bg, unsafe_allow_html=True)
-
-set_bg()
-
-# ---------- TITLE ----------
-st.title("🏭 FactoryGuard AI")
+st.title("⚙️ FactoryGuard AI")
 st.subheader("Predictive Maintenance System")
 
-st.markdown("""
-Predictive Maintenance uses Artificial Intelligence to analyze machine sensor data and predict failures before they happen.
+st.write(
+"This system predicts whether a machine is likely to fail based on sensor readings."
+)
 
-This system monitors:
+model = joblib.load("model.pkl")
 
-• Air Temperature  
-• Process Temperature  
-• Rotational Speed  
-• Torque  
-• Tool Wear  
+st.sidebar.header("Enter Machine Sensor Values")
 
-Using machine learning, the system predicts whether the machine will fail or operate normally.
-""")
+UDI = st.sidebar.number_input("UDI", value=5000.0)
 
-st.divider()
+air_temp = st.sidebar.number_input("Air temperature [K]", value=300.0)
+process_temp = st.sidebar.number_input("Process temperature [K]", value=310.0)
+rpm = st.sidebar.number_input("Rotational speed [rpm]", value=1500.0)
+torque = st.sidebar.number_input("Torque [Nm]", value=40.0)
+tool_wear = st.sidebar.number_input("Tool wear [min]", value=100.0)
 
-# ---------- LOAD MODEL ----------
-try:
-    model = joblib.load("model.pkl")
-except:
-    st.error("Model file not found. Please ensure model.pkl is in the project folder.")
-    st.stop()
+TWF = 0
+HDF = 0
+PWF = 0
+OSF = 0
+RNF = 0
 
-# ---------- SLIDERS ----------
-st.header("Machine Parameter Simulation")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    air_temp = st.slider("Air Temperature", 295.0, 305.0, 298.0)
-    process_temp = st.slider("Process Temperature", 305.0, 315.0, 308.0)
-    rpm = st.slider("Rotational Speed (RPM)", 1100, 3000, 1500)
-
-with col2:
-    torque = st.slider("Torque (Nm)", 5.0, 80.0, 40.0)
-    wear = st.slider("Tool Wear (minutes)", 0, 250, 50)
-
-# ---------- PREDICTION ----------
-if st.button("Predict Machine Status"):
-
-    features = np.array([[air_temp,process_temp,rpm,torque,wear,0,0,0,0,0,0]])
-
-    prediction = model.predict(features)
-
-    # demo override
-    if wear > 200 or torque > 70:
-        prediction = [1]
-
-    if prediction[0] == 1:
-        st.error("⚠️ Machine Failure Predicted")
-    else:
-        st.success("✅ Normal Machine Operation")
-
-st.divider()
-
-# ---------- COLORFUL GRAPH ----------
-st.header("Machine Parameter Visualization")
-
-data = pd.DataFrame({
-    "Parameter": ["Air Temp","Process Temp","RPM","Torque","Tool Wear"],
-    "Value": [air_temp,process_temp,rpm,torque,wear]
+input_df = pd.DataFrame({
+    "UDI":[UDI],
+    "Air temperature [K]":[air_temp],
+    "Process temperature [K]":[process_temp],
+    "Rotational speed [rpm]":[rpm],
+    "Torque [Nm]":[torque],
+    "Tool wear [min]":[tool_wear],
+    "TWF":[TWF],
+    "HDF":[HDF],
+    "PWF":[PWF],
+    "OSF":[OSF],
+    "RNF":[RNF]
 })
 
-fig, ax = plt.subplots()
+if st.button("Predict Machine Failure"):
 
-colors = ["#00FFFF","#00FF7F","#FFD700","#FF5733","#FF00FF"]
+    prediction = model.predict(input_df)[0]
+    probability = model.predict_proba(input_df)[0][1]
 
-ax.bar(data["Parameter"], data["Value"], color=colors)
+    if prediction == 1:
+        st.error("⚠️ Machine Failure Likely")
+    else:
+        st.success("✅ Machine Operating Normally")
 
-ax.set_title("Machine Sensor Values")
-ax.set_ylabel("Values")
+    st.metric("Failure Probability", f"{probability:.2f}")
 
-st.pyplot(fig)
+    st.subheader("Prediction Confidence")
 
-st.markdown("""
-### Graph Explanation
+    fig, ax = plt.subplots()
 
-The bar chart shows real-time machine sensor values.
+    labels = ["No Failure", "Failure"]
+    values = [1 - probability, probability]
 
-Higher values in **Torque and Tool Wear** often increase the risk of machine failure.
+    ax.bar(labels, values)
+    ax.set_ylabel("Probability")
+    ax.set_title("Model Prediction Confidence")
 
-The model analyzes these parameters together to detect abnormal machine behavior.
-""")
-
-st.divider()
-
-# ---------- MODEL INFO ----------
-st.header("Machine Learning Model")
-
-st.markdown("""
-This system uses a **Random Forest Machine Learning Model** trained on industrial predictive maintenance data.
-
-The model analyzes multiple sensor readings and predicts whether a machine may fail.
-
-Important features influencing prediction:
-
-• Tool Wear  
-• Torque  
-• Rotational Speed  
-• Process Temperature  
-""")
-
-st.divider()
-
-# ---------- FOOTER ----------
-st.markdown("""
-<style>
-.footer {
-position: fixed;
-left: 0;
-bottom: 0;
-width: 100%;
-background-color: rgba(0,0,0,0.7);
-color: white;
-text-align: center;
-padding: 10px;
-font-size:16px;
-}
-.footer a {
-color: #00FFFF;
-margin: 0 12px;
-text-decoration: none;
-}
-.footer a:hover {
-color: #FFD700;
-}
-</style>
-
-<div class="footer">
-Created with ❤️ by <b>Team CYBERsYNTH</b><br>
-<a href="https://github.com/TheAkshatGupta" target="_blank">Akshat</a>
-<a href="https://github.com/anushka4523" target="_blank">Anushka</a>
-<a href="https://github.com/nish-debug15" target="_blank">Nishit</a>
-<a href="https://github.com/kashak09" target="_blank">Kashak</a>
-</div>
-""", unsafe_allow_html=True)
+    st.pyplot(fig)
