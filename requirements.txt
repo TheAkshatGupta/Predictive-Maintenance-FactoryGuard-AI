@@ -5,6 +5,5 @@ pandas
 scikit-learn
 joblib
 matplotlib
-pillow
 
 
