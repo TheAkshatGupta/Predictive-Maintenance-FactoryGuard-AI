@@ -126,10 +126,10 @@ streamlit run app.py
 
 ### 👨‍💻 Team CYBERsYNTH
 
-Akshat 
-Anushka
-Nishit
-Kashak
+- Akshat 
+- Anushka
+- Nishit
+- Kashak
 
 ---
 
