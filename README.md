@@ -96,7 +96,7 @@ Matplotlib
 ---
 
 ## 📁 Project Structure
-
+```
 FactoryGuard-AI
 │
 ├── app.py
@@ -105,7 +105,7 @@ FactoryGuard-AI
 ├── requirements.txt
 ├── runtime.txt
 └── README.md
-
+```
 ---
 
 ## ▶️ Run Locally
