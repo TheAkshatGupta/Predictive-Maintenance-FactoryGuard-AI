@@ -1,33 +1,31 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+import streamlit as st
 import joblib
 import numpy as np
 
-app = FastAPI()
+st.set_page_config(page_title="FactoryGuard AI", layout="centered")
+
+st.title("FactoryGuard AI")
+st.subheader("Predictive Maintenance System")
 
 model = joblib.load("model.pkl")
 
-class MachineData(BaseModel):
-    air_temp: float
-    process_temp: float
-    rpm: float
-    torque: float
-    wear: float
+st.write("Enter machine parameters:")
 
-@app.get("/")
-def home():
-    return {"message": "FactoryGuard AI API Running"}
+air_temp = st.slider("Air Temperature", 295.0, 305.0, 298.0)
+process_temp = st.slider("Process Temperature", 305.0, 315.0, 308.0)
+rpm = st.slider("Rotational Speed (RPM)", 1100, 3000, 1500)
+torque = st.slider("Torque (Nm)", 5.0, 80.0, 40.0)
+wear = st.slider("Tool Wear (min)", 0, 250, 50)
 
-@app.post("/predict")
-def predict(data: MachineData):
+if st.button("Predict Machine Status"):
 
     features = np.array([[
 
-        data.air_temp,
-        data.process_temp,
-        data.rpm,
-        data.torque,
-        data.wear,
+        air_temp,
+        process_temp,
+        rpm,
+        torque,
+        wear,
         0,0,0,0,0,0
 
     ]])
@@ -35,8 +33,6 @@ def predict(data: MachineData):
     prediction = model.predict(features)
 
     if prediction[0] == 1:
-        result = "⚠️ Machine Failure Predicted"
+        st.error("⚠️ Machine Failure Predicted")
     else:
-        result = "✅ Normal Machine Operation"
-
-    return {"prediction": result}
+        st.success("✅ Normal Machine Operation")

@@ -1,11 +1,6 @@
 numpy
 pandas
 scikit-learn
-matplotlib
-seaborn
-xgboost
-shap
-fastapi
-uvicorn
+streamlit
 joblib
 
